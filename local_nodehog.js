@@ -49,22 +49,19 @@ class NodeHog {
         loggerInc = Date.now();
       }
     };
-
-    console.log(process.memoryUsage());
-    setInterval(() => {
-      console.log(process.memoryUsage());
-    }, 1000);
     
-    while (now - start < this.lifespan) {
-      if (this.type === 'memory') {
-        const {heapTotal, heapUsed} = process.memoryUsage()
-        const available8Bits = ((heapTotal - heapUsed) / 8).toFixed(0);
+    if (this.type === 'memory') {
+      const {heapTotal, heapUsed} = process.memoryUsage()
+      const available8Bits = (((heapTotal - heapUsed) / 8) - 100000).toFixed(0);
 
-        if (available8Bits - 10000 > 0) {
-          const heapHog = new Float64Array((available8Bits - 10000));
-          acc.push(heapHog);
-        }
-      } else if (this.type === 'cpu') {
+      if (available8Bits > 0) {
+        const heapHog = new Float64Array(available8Bits);
+        acc.push(heapHog);
+      }
+    }
+
+    while (now - start < this.lifespan) {
+      if (this.type === 'cpu') {
         acc += Math.random() * Math.random();
       }
 
