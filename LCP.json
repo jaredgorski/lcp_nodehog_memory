@@ -1,0 +1,4 @@
+{
+  "id": "nodehogmemory",
+  "command": ["npm", "run", "start"]
+}
