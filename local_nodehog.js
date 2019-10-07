@@ -50,6 +50,7 @@ class NodeHog {
       }
     };
 
+    console.log(process.memoryUsage());
     setInterval(() => {
       console.log(process.memoryUsage());
     }, 1000);
