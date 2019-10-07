@@ -27,7 +27,7 @@ class NodeHog {
       now = start,
       loggerInc = start,
       periodCount = 0,
-      acc = this.type === 'memory' ? {} : 0;
+      acc = this.type === 'memory' ? [] : 0;
 
     const resource = this.type === 'memory' ? 'MEMORY' : 'CPU';
     console.log('\n[ ' + this.pid + ' ] --> Stressing ' + resource + '...\n');
