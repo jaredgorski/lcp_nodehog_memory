@@ -59,6 +59,9 @@ class NodeHog {
           now = Date.now();
         }
       } else if (this.type === 'memory') {
+        const v8 = require('v8');
+        v8.setFlagsFromString('--max_old_space_size=16384');
+
         const stressMem = () => {
           const {heapTotal, heapUsed} = process.memoryUsage()
           const available8Bits = (((heapTotal - heapUsed) / 8) - 100000).toFixed(0);
@@ -80,7 +83,7 @@ class NodeHog {
 
           logger();
           now = Date.now();
-        }, 500);
+        }, 100);
       }
     };
 
