@@ -52,13 +52,13 @@ class NodeHog {
     
     while (now - start < this.lifespan) {
       if (this.type === 'memory') {
-        const str = 'abcdefghijklmnopqrstuvwxyz';
-        let i = 0;
-        setInterval(() => {
-          if (!(i in acc)) {
-            acc[i] = str;
-          }
-        }, 100);
+        const {heapTotal, heapUsed} = process.memoryUsage()
+        const available8Bits = ((heapTotal - heapUsed - 1000) / 8).toFixed(0);
+
+        if (available8Bits > 0) {
+          const heapHog = new Float64Array(available8Bits);
+          acc.push(heapHog);
+        }
       } else if (this.type === 'cpu') {
         acc += Math.random() * Math.random();
       }
