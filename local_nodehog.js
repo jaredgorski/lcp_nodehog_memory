@@ -11,7 +11,7 @@ class NodeHog {
     console.log('\n===========================================\n> Starting new NodeHog [ ' + this.pid + ' ].\n');
 
     for (let i = 0; i < this.iterations; i++) {
-      this.stress();
+      await this.stress();
       await this.relieve();
 
       if (i === this.iterations - 1) {
@@ -49,39 +49,50 @@ class NodeHog {
         loggerInc = Date.now();
       }
     };
+
+    const stressFn = () => {
+      if (this.type === 'cpu') {
+        while (now - start < this.lifespan) {
+          acc += Math.random() * Math.random();
+
+          logger();
+          now = Date.now();
+        }
+      } else if (this.type === 'memory') {
+        const stressMem = () => {
+          const {heapTotal, heapUsed} = process.memoryUsage()
+          const available8Bits = (((heapTotal - heapUsed) / 8) - 100000).toFixed(0);
+
+          if (available8Bits > 0) {
+            const heapHog = new Float64Array(available8Bits);
+            acc.push(heapHog);
+          }
+        }
+
+        const int = setInterval(() => {
+          const timeDiff = now - loggerInc;
+
+          if (timeDiff > this.lifespan) {
+            clearInterval(int);
+          }
+
+          stressMem();
+
+          logger();
+          now = Date.now();
+        }, 500);
+      }
+    };
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        logger(true);
+        resolve();
+      }, this.lifespan);
+
+      stressFn();
+    });
     
-    if (this.type === 'memory') {
-      const stressMem = () => {
-        const {heapTotal, heapUsed} = process.memoryUsage()
-        const available8Bits = (((heapTotal - heapUsed) / 8) - 100000).toFixed(0);
-
-        if (available8Bits > 0) {
-          const heapHog = new Float64Array(available8Bits);
-          acc.push(heapHog);
-        }
-      }
-
-      const int = setInterval(() => {
-        const timeDiff = now - loggerInc;
-
-        if (timeDiff > this.lifespan) {
-          clearInterval(int);
-        }
-
-        stressMem();
-      }, 1000);
-    }
-
-    if (this.type === 'cpu') {
-      while (now - start < this.lifespan) {
-        acc += Math.random() * Math.random();
-
-        logger();
-        now = Date.now();
-      }
-    }
-
-    logger(true);
   }
 
   relieve() {
