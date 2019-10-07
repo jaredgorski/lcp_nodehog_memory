@@ -51,22 +51,34 @@ class NodeHog {
     };
     
     if (this.type === 'memory') {
-      const {heapTotal, heapUsed} = process.memoryUsage()
-      const available8Bits = (((heapTotal - heapUsed) / 8) - 100000).toFixed(0);
+      const stressMem = () => {
+        const {heapTotal, heapUsed} = process.memoryUsage()
+        const available8Bits = (((heapTotal - heapUsed) / 8) - 100000).toFixed(0);
 
-      if (available8Bits > 0) {
-        const heapHog = new Float64Array(available8Bits);
-        acc.push(heapHog);
+        if (available8Bits > 0) {
+          const heapHog = new Float64Array(available8Bits);
+          acc.push(heapHog);
+        }
       }
+
+      const int = setInterval(() => {
+        const timeDiff = now - loggerInc;
+
+        if (timeDiff > this.lifespan) {
+          clearInterval(int);
+        }
+
+        stressMem();
+      }, 1000);
     }
 
-    while (now - start < this.lifespan) {
-      if (this.type === 'cpu') {
+    if (this.type === 'cpu') {
+      while (now - start < this.lifespan) {
         acc += Math.random() * Math.random();
-      }
 
-      logger();
-      now = Date.now();
+        logger();
+        now = Date.now();
+      }
     }
 
     logger(true);
