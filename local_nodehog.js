@@ -59,7 +59,7 @@ class NodeHog {
       let toggle = true;
       const maybeEnd = callback => {
         if (endStressInc > endStressTime) {
-          logger(true);
+          this.logger(true);
           this.reset();
           resolve();
         }
