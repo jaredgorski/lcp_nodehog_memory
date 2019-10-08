@@ -53,6 +53,7 @@ class NodeHog {
       let endStressInc = 0;
       const maybeEnd = callback => {
         if (endStressInc >= endStressGoal) {
+          console.log('END STRESS: ', this);
           this.reset();
           resolve();
         }
@@ -104,6 +105,7 @@ class NodeHog {
 
     return new Promise(resolve => {
       this.timeouts.push(setTimeout(() => {
+        console.log('END RELIEF: ', this);
         this.reset();
         resolve();
       }, this.deathspan));
