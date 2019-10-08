@@ -1,5 +1,6 @@
 class NodeHog {
-  constructor(type = 'cpu', lifespan = 300000, deathspan = 600000, iterations = 10) {
+  // constructor(type = 'cpu', lifespan = 300000, deathspan = 600000, iterations = 10) {
+  constructor(type = 'cpu', lifespan = 300000, deathspan = 300000, iterations = 10) {
     this.type = type.toString() === 'memory' ? 'memory' : 'cpu';
     this.lifespan = parseInt(lifespan, 10) || 300000;
     this.deathspan = parseInt(deathspan, 10) || 600000;
@@ -15,6 +16,7 @@ class NodeHog {
     this.reset = () => {
       this.periodCount = 0;
       this.toggle = false;
+      delete this.acc;
 
       if (this.type === 'memory') {
         this.acc = [];
@@ -109,17 +111,19 @@ class NodeHog {
   }
 
   periodLogger() {
-    this.periodCount++;
-    const plural = this.periodCount > 1 ? 's' : '';
+    if (this.periodCount > 0) {
+      const plural = this.periodCount > 1 ? 's' : '';
+      console.log('[ ' + this.pid + ' ] ----> ' + 
+        this.periodCount + 
+        ' ' + 
+        this.periodType + 
+        plural + 
+        ' of stress period complete.'
+      );
+    }
 
-    console.log('[ ' + this.pid + ' ] ----> ' + 
-      this.periodCount + 
-      ' ' + 
-      this.periodType + 
-      plural + 
-      ' of stress period complete.'
-    );
-  };
+    this.periodCount++;
+  }
 }
 
 module.exports = NodeHog;
