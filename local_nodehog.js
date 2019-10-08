@@ -87,7 +87,6 @@ class NodeHog {
       const available8Bits = (((heapTotal - heapUsed) / 8) - cushion).toFixed(0);
 
       if (available8Bits > 0) {
-        console.log(this.acc[0]);
         const heapHog = new Float64Array(available8Bits);
         this.acc.push(heapHog);
       }
