@@ -10,14 +10,10 @@ class NodeHog {
     this.periodType = this.lifespan > 60000 ? 'minute' : 'second';
     this.period = this.periodType === 'minute' ? 60000 : 1000;
     this.periodCount = 0;
-    this.startTime = 0;
-    this.loggerInc = 0;
     this.toggle = false;
 
     this.reset = () => {
       this.periodCount = 0;
-      this.startTime = 0;
-      this.loggerInc = 0;
       this.toggle = false;
 
       if (this.type === 'memory') {
@@ -48,28 +44,23 @@ class NodeHog {
   }
 
   stress() {
-    this.startTime = Date.now(),
-    this.loggerInc = this.startTime;
-
     console.log('\n[ ' + this.pid + ' ] --> Stressing ' + this.type.toUpperCase() + '...\n');
 
     return new Promise(resolve => {
-      const endStressTime = this.lifespan / 1000;
+      const endStressGoal = this.lifespan / this.period;
       let endStressInc = 0;
-      let toggle = true;
       const maybeEnd = callback => {
-        if (endStressInc > endStressTime) {
-          this.logger(true);
+        if (endStressInc >= endStressGoal) {
           this.reset();
           resolve();
         }
       };
 
       this.intervals.push(setInterval(() => {
+        this.periodLogger();
         maybeEnd();
-        this.logger();
         endStressInc++;
-      }, 1000));
+      }, this.period));
 
       if (this.type === 'cpu') {
         this.stressCpu();
@@ -117,23 +108,17 @@ class NodeHog {
     });
   }
 
-  logger(force) {
-    const now = Date.now();
-    const timeDiff = now - this.loggerInc;
+  periodLogger() {
+    this.periodCount++;
+    const plural = this.periodCount > 1 ? 's' : '';
 
-    if (timeDiff > this.period || force) {
-      this.periodCount++;
-      const plural = this.periodCount > 1 ? 's' : '';
-
-      console.log('[ ' + this.pid + ' ] ----> ' + 
-        this.periodCount + 
-        ' ' + 
-        this.periodType + 
-        plural + 
-        ' of stress period complete.');
-
-      this.loggerInc = Date.now();
-    }
+    console.log('[ ' + this.pid + ' ] ----> ' + 
+      this.periodCount + 
+      ' ' + 
+      this.periodType + 
+      plural + 
+      ' of stress period complete.'
+    );
   };
 }
 
