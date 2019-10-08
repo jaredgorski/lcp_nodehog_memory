@@ -1,10 +1,9 @@
 class NodeHog {
-  // constructor(type = 'cpu', lifespan = 300000, deathspan = 600000, iterations = 10) {
-  constructor(type = 'cpu', lifespan = 300000, deathspan = 300000, iterations = 10) {
+  constructor(type = 'cpu', lifespan = 300000, deathspan = 600000, iterations = 1) {
     this.type = type.toString() === 'memory' ? 'memory' : 'cpu';
     this.lifespan = parseInt(lifespan, 10) || 300000;
     this.deathspan = parseInt(deathspan, 10) || 600000;
-    this.iterations = parseInt(iterations, 10) || 10;
+    this.iterations = parseInt(iterations, 10) || 1;
     this.pid = Math.random().toString(36).substr(2, 5);
 
     this.acc = this.type === 'memory' ? [] : 0;
@@ -53,16 +52,15 @@ class NodeHog {
       let endStressInc = 0;
       const maybeEnd = callback => {
         if (endStressInc >= endStressGoal) {
-          console.log('END STRESS: ', this);
           this.reset();
           resolve();
         }
       };
 
       this.intervals.push(setInterval(() => {
-        this.periodLogger();
-        maybeEnd();
         endStressInc++;
+        maybeEnd();
+        this.periodLogger();
       }, this.period));
 
       if (this.type === 'cpu') {
@@ -105,7 +103,6 @@ class NodeHog {
 
     return new Promise(resolve => {
       this.timeouts.push(setTimeout(() => {
-        console.log('END RELIEF: ', this);
         this.reset();
         resolve();
       }, this.deathspan));
@@ -113,18 +110,16 @@ class NodeHog {
   }
 
   periodLogger() {
-    if (this.periodCount > 0) {
-      const plural = this.periodCount > 1 ? 's' : '';
-      console.log('[ ' + this.pid + ' ] ----> ' + 
-        this.periodCount + 
-        ' ' + 
-        this.periodType + 
-        plural + 
-        ' of stress period complete.'
-      );
-    }
-
     this.periodCount++;
+
+    const plural = this.periodCount > 1 ? 's' : '';
+    console.log('[ ' + this.pid + ' ] ----> ' + 
+      this.periodCount + 
+      ' ' + 
+      this.periodType + 
+      plural + 
+      ' of stress period complete.'
+    );
   }
 }
 
