@@ -83,10 +83,11 @@ class NodeHog {
 
     const stressMem = () => {
       const {heapTotal, heapUsed} = process.memoryUsage()
-      const cushion = 10000;
+      const cushion = 1000;
       const available8Bits = (((heapTotal - heapUsed) / 8) - cushion).toFixed(0);
 
       if (available8Bits > 0) {
+        console.log(this.acc[0]);
         const heapHog = new Float64Array(available8Bits);
         this.acc.push(heapHog);
       }
@@ -94,7 +95,7 @@ class NodeHog {
 
     this.intervals.push(setInterval(() => {
       stressMem();
-    }, 50));
+    }, 1));
   }
 
   relieve() {
