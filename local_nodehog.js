@@ -94,7 +94,7 @@ class NodeHog {
 
     this.intervals.push(setInterval(() => {
       stressMem();
-    }, 1));
+    }, 50));
   }
 
   relieve() {
